@@ -108,6 +108,16 @@ const Relationships = (db) => {
           let lookup = {}
           rows.forEach(row => {
             lookup[row[targetIndex]] = row
+            if (!foreignTable.oneToOne) {
+              // One-To-Many. Always create the property no matter if
+              // it will be empty or not (empty array if so, rather than undefined)
+              Object.defineProperty(row, column, {
+                value: [],
+                enumerable: false,
+                configurable: true,
+                writable: true
+              })
+            }
           })
 
           // Populate column on each row
@@ -121,17 +131,17 @@ const Relationships = (db) => {
                 `The content of the failing key was: ${JSON.stringify(foreignKey)}.`)
             }
 
-            if (foreignTable.oneToOne || !row.hasOwnProperty(column)) {
+            if (foreignTable.oneToOne) {
               // Set it as a non-enumerable property so that the object can be safely put back
               // to indexeddb without storing relations redundantly (IndexedDB will only store "own non-
               // enumerable properties")
               Object.defineProperty(row, column, {
-                value: foreignTable.oneToOne ? record : [record],
+                value: record,
                 enumerable: false,
                 configurable: true,
                 writable: true
               })
-            } else if (!foreignTable.oneToOne) {
+            } else {
               row[column].push(record)
             }
           })

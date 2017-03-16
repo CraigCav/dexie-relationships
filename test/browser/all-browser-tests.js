@@ -43,6 +43,10 @@ describe('simple', function () {
             id: 2,
             name: 'Abba',
             genreId: 2
+          },{
+            id: 3,
+            name: 'Band without albums',
+            genreId: 1
           }])
 
           // Albums
@@ -161,6 +165,17 @@ describe('simple', function () {
           assert (true, "Promise resolved and no exception occured")
         }).catch (ex => {
           assert (false, "Something went wrong: " + (ex.stack || ex))
+        })
+    })
+  })
+
+  describe('Band without albums (Issue #12)', ()=> {
+    it('should get empty array property rather than undefined', ()=>{
+      return db.bands
+        .where('name').equals('Band without albums')
+        .with({albums: 'albums'})
+        .first(band => {
+          assert(band.albums && band.albums.length === 0, "Should have empty array");
         })
     })
   })
