@@ -121,7 +121,7 @@ const Relationships = (db) => {
             let foreignKey = row[targetIndex]
             let record = lookup[foreignKey]
             if (!record) {
-              throw new Error(
+              return console.warn(
                 `Could not lookup foreign key where ` +
                 `${tableName}.${foreignIndex} == ${baseTable}.${column}. ` +
                 `The content of the failing key was: ${JSON.stringify(foreignKey)}.`)
